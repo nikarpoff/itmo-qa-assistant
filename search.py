@@ -17,7 +17,7 @@ if __name__ == "__main__":
             print(f"\nResult {i}:")
             print(f"Title: {title}")
             print(f"Score: {score:.4f}")
-            print(f"Content: {text[:200]}...")  # Print first 200 characters of content
+            print(f"Content: {text}...")  # Print first 200 characters of content
 
     except database.EmbeddingError as e:
         print(f"Embedding error: {e}")

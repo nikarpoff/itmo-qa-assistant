@@ -28,6 +28,6 @@ class LocalEmbedder(Embedder):
             prefixed_text,
             normize_embeddings=True,
             convert_to_numpy=False,
-            show_progress_bar=True
+            show_progress_bar=False
         ).tolist()
     
