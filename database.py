@@ -3,7 +3,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct, UpdateStatus
 from qdrant_client.http.exceptions import UnexpectedResponse
 
-from embeddings import Embedder
+from embeddings import LocalEmbedder
 
 
 class EmbeddingError(Exception):
@@ -17,7 +17,7 @@ class DatabaseError(Exception):
 
 
 class DatabaseWorker():
-    def __init__(self, client: QdrantClient, embedder: Embedder, collection_name: str, size=1024):
+    def __init__(self, client: QdrantClient, embedder: LocalEmbedder, collection_name: str, size=1024):
         """
         Класс для работы с базой данных Qdrant
         :param client: клиент базы данных

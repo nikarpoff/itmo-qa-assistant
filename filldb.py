@@ -53,13 +53,14 @@ def write_pages_into_db(filename, db_worker: database.DatabaseWorker):
             cleared_text = utils.clear_text(text)
 
             # Делим на чанки
-            chunked_text = utils.split_by_chunks(cleared_text)
+            chunked_text = utils.split_by_chunks(cleared_text, db_worker.embedder.tokenizer)
 
             print(f"\t Writing page: {title} (id={id}), {len(chunked_text)} chunks")
 
             for i, chunk in enumerate(chunked_text):
                 payload = {
-                    "content": cleared_text,    # в payload сохраняем весь текст статьи
+                    "content": chunk,    # в payload сохраняем весь текст статьи
+                    "full_text": text,
                     "metadata": {
                         "wiki_id": id,
                         "chunk": i,

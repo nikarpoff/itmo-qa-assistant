@@ -25,21 +25,33 @@ class LocalLLM(LLM):
             self.device = torch.device(device)
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(model_name).to(self.device)
-
-        self.model.eval()
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            # device_map="auto",
+            # dtype="auto",
+            # trust_remote_code=True
+        )
 
     def answer(self, system_prompt: str, user_prompt: str) -> str:
-        inputs = self.tokenizer(system_prompt, max_length=512, padding=True, truncation=True, return_tensors="pt")
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        
+        inputs = self.tokenizer.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt"
+        ).to(self.device)
 
-        with torch.no_grad():
-            output = self.model.generate(
-                **inputs.to(self.device),
-                do_sample=True,
-                max_new_tokens=512
-            )
+        outputs = self.model.generate(
+            **inputs,
+            max_new_tokens=512
+        )
 
-        return self.tokenizer.decode(output[0], skip_special_tokens=True)
+        return self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
 
 class RemoteGigaChatLLM(LLM):
     def __init__(self, scope: str, authorization_key: str):
@@ -116,7 +128,7 @@ class RemoteDeepseekLLM(LLM):
         response = self.client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": user_prompt},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
             stream=False

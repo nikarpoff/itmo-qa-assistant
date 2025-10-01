@@ -11,9 +11,7 @@ class RAGAssistant:
         load_dotenv()
         self.model = None
 
-        if model_type == "local":
-            self.model = llm.LocalLLM()
-        elif model_type == "gigachat-remote":
+        if model_type == "gigachat-remote":
             scope = os.getenv("SBER_SCOPE")
             authorization_key = os.getenv("SBER_API_KEY")
 
@@ -31,8 +29,10 @@ class RAGAssistant:
                 api_key=api_key
             )
         else:
-            raise NotImplementedError(f"Model type {model_type} not implemented yet.")
+            # Полагаем, что пользователь выбрал локальную модель
+            self.model = llm.LocalLLM(model_type)
 
+        print("!")
         self.db_worker = utils.get_db_worker()
 
     def generate_answer(self, question):
@@ -59,7 +59,7 @@ class RAGAssistant:
 
 
 if __name__ == "__main__":
-    assistant = RAGAssistant(model_type="gigachat-remote")
+    assistant = RAGAssistant(model_type="deepseek-ai/DeepSeek-R1-Distill-Llama-8B")
     question = "Что такое исполнитель желаний?"
     answer = assistant.generate_answer(question)
     print(f"Question: {question}\nAnswer: {answer}")

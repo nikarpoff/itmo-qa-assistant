@@ -1,6 +1,7 @@
 import os
 import re
 from dotenv import load_dotenv
+from transformers import AutoTokenizer
 
 from qdrant_client import QdrantClient
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -41,7 +42,7 @@ def clear_text(text: str) -> str:
     :param text: исходный текст
     :return: очищенный текст
     """
-    text = text.strip().lower()
+    text = text.lower()
 
     # Удаляем специальные конструкции
     text = re.sub(r'__disambig__', '', text)
@@ -75,7 +76,7 @@ def clear_text(text: str) -> str:
 
     return text
 
-def split_by_chunks(text: str, chunk_size=500, overlap=75) -> list:
+def split_by_chunks(text: str, tokenizer: AutoTokenizer, chunk_size=512, overlap=64) -> list:
     """
     Разбивает текст на чанки заданного размера с заданным перекрытием.
     :param text: исходный текст
@@ -83,7 +84,8 @@ def split_by_chunks(text: str, chunk_size=500, overlap=75) -> list:
     :param overlap: размер перекрытия между чанками
     :return: список чанков
     """
-    splitter = RecursiveCharacterTextSplitter(
+    splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
+        tokenizer=tokenizer,
         chunk_size=chunk_size,
         chunk_overlap=overlap,
         separators=["\n\n", "\n"]
