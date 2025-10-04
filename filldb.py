@@ -53,7 +53,7 @@ def write_pages_into_db(filename, db_worker: database.DatabaseWorker):
             cleared_text = utils.clear_text(text)
 
             # Делим на чанки
-            chunked_text = utils.split_by_chunks(cleared_text, db_worker.embedder.tokenizer)
+            chunked_text = utils.split_by_chunks(cleared_text, db_worker.embedder.tokenizer, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
 
             print(f"\t Writing page: {title} (id={id}), {len(chunked_text)} chunks")
 

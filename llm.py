@@ -26,10 +26,7 @@ class LocalLLM(LLM):
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            # device_map="auto",
-            # dtype="auto",
-            # trust_remote_code=True
+            model_name
         )
 
     def answer(self, system_prompt: str, user_prompt: str) -> str:
@@ -54,13 +51,14 @@ class LocalLLM(LLM):
         return self.tokenizer.decode(outputs[0][inputs["input_ids"].shape[-1]:], skip_special_tokens=True)
 
 class RemoteGigaChatLLM(LLM):
-    def __init__(self, scope: str, authorization_key: str):
+    def __init__(self, model_name: str, scope: str, authorization_key: str):
         self.auth_url = config.SBER_AUTH_URL
         self.model_url = config.GIGACHAT_API_URL
         self.scope = scope
         self.authorization_key = authorization_key
 
         self.giga = GigaChat(
+            model=model_name,
             credentials=authorization_key,
             ca_bundle_file="russian_trusted_root_ca.cer"
         )

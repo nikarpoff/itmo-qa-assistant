@@ -1,7 +1,9 @@
 import torch
 import torch.nn.functional as F
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, logging as transformers_logging
 
+# Отключаем предупреждения transformers
+transformers_logging.set_verbosity_error()
 
 def pool(hidden_state, mask, pooling_method="cls"):
     if pooling_method == "mean":
